@@ -36,8 +36,11 @@ fonts = ['./fonts/arialbi.ttf']
 # fonts = ['./fonts/timesbi.ttf']
 
 # fonts_dir = './fonts'
-# fonts = os.listdir(fonts_dir)
-# fonts = [osp.join(fonts_dir, f) for f in fonts]
+# fn_list = os.listdir(fonts_dir)
+# fonts = []
+# for f in fn_list:
+#     if f.endswith('.ttf'):
+#         fonts.append(osp.join(fonts_dir, f))
 
 print 'using fonts: ', fonts
 
