@@ -30,37 +30,42 @@ else:
     __all__ = ['ImageCaptcha']
 
 
-table  =  []
-for  i  in  range( 256 ):
-    table.append( i * 1.97 )
+table = []
+for i in range(256):
+    table.append(i * 1.97)
 
 
 class _Captcha(object):
-    def generate(self, chars, format='png'):
+    def generate(self, chars, format='png', noise_dots=True, noise_curve=True):
         """Generate an Image Captcha of the given characters.
 
         :param chars: text to be generated.
         :param format: image file format
+        :param noise_dots: add noise dots or not (This param was added by zhaoyafei 20181104)
+        :param noise_curve: add noise curve or not (This param was added by zhaoyafei 20181104)
         """
-        im = self.generate_image(chars)
+        im = self.generate_image(chars, noise_dots, noise_curve)
         out = BytesIO()
         im.save(out, format=format)
         out.seek(0)
         return out
 
-    def write(self, chars, output, format='png'):
+    def write(self, chars, output, format='png', noise_dots=True, noise_curve=True):
         """Generate and write an image CAPTCHA data to the output.
 
         :param chars: text to be generated.
         :param output: output destination.
         :param format: image file format
+        :param noise_dots: add noise dots or not (This param was added by zhaoyafei 20181104)
+        :param noise_curve: add noise curve or not (This param was added by zhaoyafei 20181104)
         """
-        im = self.generate_image(chars)
+        im = self.generate_image(chars, noise_dots, noise_curve)
         return im.save(output, format=format)
 
 
 class WheezyCaptcha(_Captcha):
     """Create an image CAPTCHA with wheezy.captcha."""
+
     def __init__(self, width=200, height=75, fonts=None):
         self._width = width
         self._height = height
@@ -106,6 +111,7 @@ class ImageCaptcha(_Captcha):
     :param fonts: Fonts to be used to generate CAPTCHA images.
     :param font_sizes: Random choose a font size from this parameters.
     """
+
     def __init__(self, width=160, height=60, fonts=None, font_sizes=None):
         self._width = width
         self._height = height
@@ -218,7 +224,7 @@ class ImageCaptcha(_Captcha):
 
         return image
 
-    def generate_image(self, chars):
+    def generate_image(self, chars, noise_dots=True, noise_curve=True):
         """Generate the image of the given characters.
 
         :param chars: text to be generated.
@@ -226,9 +232,23 @@ class ImageCaptcha(_Captcha):
         background = random_color(238, 255)
         color = random_color(10, 200, random.randint(220, 255))
         im = self.create_captcha_image(chars, color, background)
-        self.create_noise_dots(im, color)
-        self.create_noise_curve(im, color)
+
+        ######################################
+        # added by zhaoyafei 20181104
+        if noise_dots:
+            self.create_noise_dots(im, color)
+
+        if noise_curve:
+            self.create_noise_curve(im, color)
+        ######################################
+
         im = im.filter(ImageFilter.SMOOTH)
+        # im = im.filter(ImageFilter.SMOOTH_MORE)
+
+        # sz = im.size
+        # sz2 = sz[0] * 3, sz[1] * 3
+        # im2 = im.resize(sz2, Image.ANTIALIAS)
+        # im = im2.resize(sz,  Image.ANTIALIAS)
         return im
 
 
